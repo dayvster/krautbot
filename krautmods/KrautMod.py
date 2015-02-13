@@ -47,10 +47,11 @@ class KrautMod(object):
 				print(line)
 				line = str.rstrip(line)
 				line = str.split(line)
-				print("LIST:"+str(line))
+				#print("LIST:"+str(line))
 				# Krauty plays PING PONG with the server here
 				self.KeepAlive(line)
-
+				# Krauty needs to know weather the user is talking to him privately or in a channel
+				self.chanOrPvt(line)
 
 	def KeepAlive(self, ircOutputLine):
 		if(ircOutputLine[0] == "PING" ):
@@ -58,4 +59,27 @@ class KrautMod(object):
 			self.irc.send(bytes("PONG %s\r\n" % ircOutputLine[1], "UTF-8"))
 			return 1
 		return 0
+	def isPRIVMSG(self, ircOutputLine):
+		if(ircOutputLine[1] == "PRIVMSG"):
+			return True
+		else:
+			return False
+	def chanOrPvt(self, ircOutputLine):
+		if(self.isPRIVMSG(ircOutputLine)):
+			if(str(ircOutputLine[2]).find('#') != -1):
+				print("sent via channel")
+			else:
+				print("sent via user query")
+	def respondToChanCMD(self, user, cmd, *args):
+		print(" ")
+	def respondToPvtCMD(self, user, cmd, *args):
+		print(" ")
+	def YouTalkinToME(self, ircOutputLine):
+		if(self.isPRIVMSG(ircOutputLine)):
+			if(str(ircOutputLine[3]).find(str(self.nick))!=-1):
+				return True
+			else:
+				return False
 	
+	def sendPRIVMSGtoChan(self, msg, chan):
+		self.irc.send(self.UTF8enc("PRIVMSG "+chan+" "+msg+"\r\n"))
