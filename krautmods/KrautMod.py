@@ -1,18 +1,21 @@
-import socket, traceback
+import socket, traceback, re
 class KrautMod(object):
-	PORT 	= 6667
-	SERVER 	= ""
-	CHAN	= ""
-	irc 	= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	nick	= ""
-	oBuff 	= ""
+	PORT 		= 0
+	SERVER 		= ""
+	CHAN		= ""
+	irc 		= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	nick		= ""
+	oBuff 		= ""
+	shortNick 	= ""
 
 	"""docstring for KrautMod"""
-	def __init__(self, nick="krautbot", chan="#krautbot", SERVER="irc.freenode.net"):
+	def __init__(self, nick="krautbot", chan="#krautbot", SERVER="irc.freenode.net", port=6667, shortNick="Krauty"):
 		super(KrautMod, self).__init__()
-		self.nick 	= nick
-		self.chan 	= chan
-		self.SERVER = SERVER
+		self.nick 		= nick
+		self.chan 		= chan
+		self.SERVER 	= SERVER
+		self.PORT 		= port
+		self.shortNick 	= shortNick
 		try:
 			self.connect()
 			self.IRCinit()
@@ -67,7 +70,9 @@ class KrautMod(object):
 	def chanOrPvt(self, ircOutputLine):
 		if(self.isPRIVMSG(ircOutputLine)):
 			if(str(ircOutputLine[2]).find('#') != -1):
-				print("sent via channel")
+				if(self.YouTalkinToME(ircOutputLine) == True):
+					user = self.getNick(ircOutputLine)
+					self.sendPRIVMSGtoChan(str(user)+" has spoken!", self.chan)
 			else:
 				print("sent via user query")
 	def respondToChanCMD(self, user, cmd, *args):
@@ -76,10 +81,25 @@ class KrautMod(object):
 		print(" ")
 	def YouTalkinToME(self, ircOutputLine):
 		if(self.isPRIVMSG(ircOutputLine)):
-			if(str(ircOutputLine[3]).find(str(self.nick))!=-1):
+			msgLst = ircOutputLine[3].strip(":").split(" ")
+			print(msgLst)
+			if(msgLst[0] == str(self.nick) or msgLst[0] == "krauty"):
 				return True
 			else:
 				return False
-	
+			"""if(str(ircOutputLine[3]).find(str(self.nick))!=-1 or ircOutputLine[3].find(str("krauty"))):
+				return True
+			else:
+				return False"""
+
+	def GetUID(self, ircOutputLine):
+		user = ircOutputLine[0].split("~")[1]
+		user = user.split("@")[0]
+		return user
+	def getNick(self, ircOutputLine):
+		user = ircOutputLine[0].split(":")[1]
+		user = user.split("!")[0]
+		return user
 	def sendPRIVMSGtoChan(self, msg, chan):
-		self.irc.send(self.UTF8enc("PRIVMSG "+chan+" "+msg+"\r\n"))
+		self.irc.send(self.UTF8enc("PRIVMSG "+chan+" :"+msg+"\r\n"))
+
