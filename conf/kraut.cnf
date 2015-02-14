@@ -1,4 +1,19 @@
-[ok2]
-field = name
-value = value
+[user_list]
+nixfox 	= admin
+* 		= guest
+
+[responses]
+hello		= Hey there
+hi 			= Hi, 
+yo			= sup
+howareyou	= Can not complain
+
+
+[info]
+name 		= krautbot
+author 		= Dayvi Schuster(NixFox)
+url 		= http://www.github.com/nixfox/krautbot
+version 	= 0.1
+lang		= python3.4
+description = A simple and functional IRC bot written in python
 

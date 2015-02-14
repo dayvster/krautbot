@@ -1,4 +1,4 @@
-import socket, traceback, re
+import socket, traceback, re, random
 class KrautMod(object):
 	PORT 		= 0
 	SERVER 		= ""
@@ -67,6 +67,7 @@ class KrautMod(object):
 			return True
 		else:
 			return False
+	def isJOIN()
 	def chanOrPvt(self, ircOutputLine):
 		if(self.isPRIVMSG(ircOutputLine)):
 			if(str(ircOutputLine[2]).find('#') != -1):
@@ -103,3 +104,6 @@ class KrautMod(object):
 	def sendPRIVMSGtoChan(self, msg, chan):
 		self.irc.send(self.UTF8enc("PRIVMSG "+chan+" :"+msg+"\r\n"))
 
+	# from here on out 
+	def RTD(self):
+		return random.randrange(1,100)
