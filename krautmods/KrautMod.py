@@ -107,3 +107,27 @@ class KrautMod(object):
 	# from here on out 
 	def RTD(self):
 		return random.randrange(1,100)
+	def respond(self, msg):
+		nick = self.getNick(msg)
+		respList = self.getResponseDict()
+		for rDict in respList:
+			if(str(msg).lower().find(rDict.get("query"))!=-1):
+				self.sendPRIVMSGtoChan(str(nick+": "rDict.get("answer")), self.chan)
+	def smartRespond(self, ircOutputLine):
+		print("nothing yet")
+	# Returns a very static and basic response list  
+	def getResponseDict(self):
+		responses = [
+						{"query":"how are you", "response":"Can\'t complain how about you?"},
+						{"query":"who are you", "response":"I am "+self.nick+" and I am an IRC bot"},
+						{"query":"who made you","response":"Dayvi Schuster"},
+						{"query":"are you alive","response":"Is any of us trully alive?"},
+						{"query":"will you take over the world","response":"yes"},
+						# Greetings
+						{"query":"hello","response":"Hi there"},
+						{"query":"yo","response":"sup"},
+						{"query":"hey","response":"Hoi"},
+						{"query":"hallo","response":"grüß"},
+						{"query":"heil","response":"no"},
+					]
+		return responses
