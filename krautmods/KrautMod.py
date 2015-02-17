@@ -53,9 +53,8 @@ class KrautMod(object):
 				#print("LIST:"+str(line))
 				# Krauty plays PING PONG with the server here
 				self.KeepAlive(line)
-				# Krauty needs to know weather the user is talking to him privately or in a channel
-				self.chanOrPvt(line)
-
+				# IT'S ALIVE!!!
+				self.live(line)
 	def KeepAlive(self, ircOutputLine):
 		if(ircOutputLine[0] == "PING" ):
 			print("PONG MOTHAFUCKA!!!")
@@ -67,15 +66,14 @@ class KrautMod(object):
 			return True
 		else:
 			return False
-	def isJOIN()
+	def isJOIN():
+		print("nothing")
 	def chanOrPvt(self, ircOutputLine):
 		if(self.isPRIVMSG(ircOutputLine)):
 			if(str(ircOutputLine[2]).find('#') != -1):
-				if(self.YouTalkinToME(ircOutputLine) == True):
-					user = self.getNick(ircOutputLine)
-					self.sendPRIVMSGtoChan(str(user)+" has spoken!", self.chan)
+				return "chan"
 			else:
-				print("sent via user query")
+				return "user"
 	def respondToChanCMD(self, user, cmd, *args):
 		print(" ")
 	def respondToPvtCMD(self, user, cmd, *args):
@@ -103,16 +101,25 @@ class KrautMod(object):
 		return user
 	def sendPRIVMSGtoChan(self, msg, chan):
 		self.irc.send(self.UTF8enc("PRIVMSG "+chan+" :"+msg+"\r\n"))
-
+	def getMsgAsString(self, ircOutputLine):
+		buff 	= ""
+		i 		= 0
+		for fld in ircOutputLine:
+			if(i>=4):
+				buff = buff +" "+ fld
+			i=i+1
+		buffSize = len(buff)
+		return buff[1:buffSize]
 	# from here on out 
 	def RTD(self):
 		return random.randrange(1,100)
-	def respond(self, msg):
-		nick = self.getNick(msg)
+	def respond(self, msg, ircOutputLine):
+		nick = str(self.getNick(ircOutputLine))
 		respList = self.getResponseDict()
+		print(msg)
 		for rDict in respList:
-			if(str(msg).lower().find(rDict.get("query"))!=-1):
-				self.sendPRIVMSGtoChan(str(nick+": "rDict.get("answer")), self.chan)
+			if(str(msg).lower() == rDict.get("query")):
+				self.sendPRIVMSGtoChan(nick+" "+rDict.get("response"), self.chan)
 	def smartRespond(self, ircOutputLine):
 		print("nothing yet")
 	# Returns a very static and basic response list  
@@ -131,3 +138,9 @@ class KrautMod(object):
 						{"query":"heil","response":"no"},
 					]
 		return responses
+	def live(self, ircOutputLine):
+		if(self.YouTalkinToME(ircOutputLine)):
+			#print("YOU TALKIN TO ME? Cause I dont see anyone else here")
+			print("LINE [3]: "+str(ircOutputLine))
+			self.respond(str(self.getMsgAsString(ircOutputLine)), ircOutputLine)
+
