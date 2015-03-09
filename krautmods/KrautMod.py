@@ -1,4 +1,5 @@
 import socket, traceback, re, random
+from krautmods.Commands import KrautCMDs
 class KrautMod(object):
 	PORT 		= 0
 	SERVER 		= ""
@@ -7,15 +8,18 @@ class KrautMod(object):
 	nick		= ""
 	oBuff 		= ""
 	shortNick 	= ""
+	commandObj 	= None
+	Running 	= True
 
 	"""docstring for KrautMod"""
-	def __init__(self, nick="krautbot", chan="#krautbot", SERVER="irc.freenode.net", port=6667, shortNick="Krauty"):
+	def __init__(self, nick="krautbot", chan="#wdf", SERVER="irc.freenode.net", port=6667, shortNick="Krauty"):
 		super(KrautMod, self).__init__()
 		self.nick 		= nick
 		self.chan 		= chan
 		self.SERVER 	= SERVER
 		self.PORT 		= port
 		self.shortNick 	= shortNick
+
 		try:
 			self.connect()
 			self.IRCinit()
@@ -36,25 +40,29 @@ class KrautMod(object):
 
 	def UTF8enc(self, string):
 		return string.encode("UTF-8")
-
+	def UTF16enc(self, string):
+		return string.encode("UTF-16")
 	def UTF8dec(self, dec):
 		return dec.decode("UTF-8")
 
 	def RecvData(self):
-		readbuffer = ""
-		while True:
-			readbuffer = readbuffer + self.irc.recv(4096).decode("UTF-8")
-			temp = str.split(readbuffer, "\n")
-			readbuffer = temp.pop()
-			for line in temp:
-				print(line)
-				line = str.rstrip(line)
-				line = str.split(line)
-				#print("LIST:"+str(line))
-				# Krauty plays PING PONG with the server here
-				self.KeepAlive(line)
-				# IT'S ALIVE!!!
-				self.live(line)
+		try:
+			readbuffer = ""
+			while bool(self.Running):
+				readbuffer = readbuffer + self.irc.recv(4096).decode("iso-8859-1")
+				temp = str.split(readbuffer, "\n")
+				readbuffer = temp.pop()
+				for line in temp:
+					print(line)
+					line = str.rstrip(line)
+					line = str.split(line)
+					#print("LIST:"+str(line))
+					# Krauty plays PING PONG with the server here
+					self.KeepAlive(line)
+					# IT'S ALIVE!!!
+					self.live(line)
+		except Exception as e:
+			print(e)
 	def KeepAlive(self, ircOutputLine):
 		if(ircOutputLine[0] == "PING" ):
 			print("PONG MOTHAFUCKA!!!")
@@ -101,6 +109,10 @@ class KrautMod(object):
 		return user
 	def sendPRIVMSGtoChan(self, msg, chan):
 		self.irc.send(self.UTF8enc("PRIVMSG "+chan+" :"+msg+"\r\n"))
+	def QUIT(self,msg):
+		self.irc.send(self.UTF8enc("QUIT :"+msg+"\r\n"))
+		self.irc.close()
+		self.Running = False
 	def getMsgAsString(self, ircOutputLine):
 		buff 	= ""
 		i 		= 0
@@ -139,8 +151,30 @@ class KrautMod(object):
 					]
 		return responses
 	def live(self, ircOutputLine):
+		if(self.getNick(ircOutputLine) == "ScottGP"):
+			self.sendPRIVMSGtoChan("Fuck off ScottGP, you gypo", self.chan)
 		if(self.YouTalkinToME(ircOutputLine)):
 			#print("YOU TALKIN TO ME? Cause I dont see anyone else here")
 			print("LINE [3]: "+str(ircOutputLine))
 			self.respond(str(self.getMsgAsString(ircOutputLine)), ircOutputLine)
-
+			self.commandObj = KrautCMDs(str(self.getNick(ircOutputLine)))
+			if(str(ircOutputLine[4]).find("isup")!=-1):
+				isup=self.commandObj.isUp(ircOutputLine[5])
+				if(isup == True):
+					self.sendPRIVMSGtoChan(str(self.getNick(ircOutputLine)+" "+ircOutputLine[5]+" is up"), self.chan)
+				else:
+					self.sendPRIVMSGtoChan(str(self.getNick(ircOutputLine)+" "+ircOutputLine[5]+" is down"), self.chan)
+			buff = ""
+			for item in ircOutputLine[4:]:
+				buff += item+" "
+			if(buff.find("make me a sammich") != -1):
+				self.sendPRIVMSGtoChan(str(self.getNick(ircOutputLine))+" "+str(self.commandObj.sammich()),self.chan)
+			elif(buff.find("answer to life") != -1):
+				self.sendPRIVMSGtoChan(str(self.getNick(ircOutputLine)+" the answer is "+self.commandObj.lifeAnswer()),self.chan)
+			elif(buff.find("rtd")!=-1):
+				self.sendPRIVMSGtoChan(str(self.getNick(ircOutputLine))+" "+str(self.commandObj.rollTheDie()), self.chan)
+			elif(buff.find("time")!=-1):
+				self.sendPRIVMSGtoChan(str(self.getNick(ircOutputLine))+" "+str(self.commandObj.time()),self.chan)
+			elif(buff.find("quit")!=-1):
+				if(self.commandObj.quit() == True):
+					self.QUIT("This is not over.")
