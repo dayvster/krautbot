@@ -185,6 +185,13 @@ class KrautMod(object):
 					self.sendPRIVMSGtoChan(str(self.getNick(ircOutputLine)+" "+ircOutputLine[5]+" is up"), self.chan)
 				else:
 					self.sendPRIVMSGtoChan(str(self.getNick(ircOutputLine)+" "+ircOutputLine[5]+" is down"), self.chan)
+			elif(str(ircOutputLine[4]).find("reverse")!=-1):
+				self.sendPRIVMSGtoChan(str(self.getNick(ircOutputLine))+" "+str(self.commandObj.reverse(ircOutputLine[5:])),self.chan)
+			elif(str(ircOutputLine[4]).find("ispalindrome")!=-1):
+				if(self.commandObj.isPalindrome(ircOutputLine[5])==True):
+					self.sendPRIVMSGtoChan(str(self.getNick(ircOutputLine))+" "+ircOutputLine[5]+" is indeed a palindrome.", self.chan)
+				else:
+					self.sendPRIVMSGtoChan(str(self.getNick(ircOutputLine))+" "+ircOutputLine[5]+" is not a palindrome.", self.chan)
 			buff = ""
 			for item in ircOutputLine[4:]:
 				buff += item+" "
@@ -199,3 +206,5 @@ class KrautMod(object):
 			elif(buff.find("quit")!=-1):
 				if(self.commandObj.quit() == True):
 					self.QUIT("This is not over.")
+
+

@@ -61,3 +61,29 @@ class KrautCMDs(object):
 			return False
 		return False
 
+	def reverse(self, msg):
+		buff = ""
+		if(isinstance(msg, list)):
+			for item in msg:
+				buff += item+" "
+			msg = buff
+		msg = msg[::-1]
+		return msg
+
+	def isPalindrome(self, msg):
+		if(msg.upper() == msg[::-1].upper()):
+			return True
+		return False
+
+	def shuffle(self, msg):
+		buff = ""
+		if isinstance(msg, list):
+			for item in msg:
+				buff += item+" "
+			msg = buff
+		msg = ''.join(random.sample(msg,len(msg)))
+		return msg
+
+	def strLen(self, msg):
+		ln = len(msg)
+		return ln
