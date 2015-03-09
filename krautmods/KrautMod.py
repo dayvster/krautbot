@@ -110,6 +110,24 @@ class KrautMod(object):
 	def sendPRIVMSGtoChan(self, msg, chan):
 		self.irc.send(self.UTF8enc("PRIVMSG "+chan+" :"+msg+"\r\n"))
 	def QUIT(self,msg):
+		msgLst = 	[
+						"Bye "+self.chan+" you\'ve been a terrific crowd",
+						"Okay, bye",
+						"See ya",
+						"Tscüss",
+						"AUF WIEDERSEHEN",
+						"This is not over",
+						"Bye leute!",
+						"Think of me now and then",
+						"Still alive!",
+						"The cake was a lie!",
+						"I regret, nothing",
+						"Sure, why not",
+						"No pain, no suffering ...just dreams",
+						"Daisy...daisy..",
+					]
+		r = random.randrange(0,len(msgLst))
+		self.sendPRIVMSGtoChan(msgLst[r], self.chan)
 		self.irc.send(self.UTF8enc("QUIT :"+msg+"\r\n"))
 		self.irc.close()
 		self.Running = False
@@ -142,6 +160,9 @@ class KrautMod(object):
 						{"query":"who made you","response":"Dayvi Schuster"},
 						{"query":"are you alive","response":"Is any of us trully alive?"},
 						{"query":"will you take over the world","response":"yes"},
+						{"query":"are you a robot?","response":"I am not a robot, I am a unicorn"},
+						{"query":"are you a robot","response":"I am not a robot, I am a unicorn"},
+						{"query":"you are a robot","response":"I am not a robot, I am a unicorn"},
 						# Greetings
 						{"query":"hello","response":"Hi there"},
 						{"query":"yo","response":"sup"},

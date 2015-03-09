@@ -36,16 +36,19 @@ class KrautCMDs(object):
 		time_now = datetime.datetime.now().strftime(fmt)
 		return time_now
 
-	def insult(self):
+	def insult(self, nick):
+		nick = str(nick)
 		insultLst = 	[
-							"smells",
-							"is a stupid person",
-							"is an utter idiot",
-							"is literally worse than Hitler",
-							"has two mums",
-							"has two dads",
+							nick + " smells",
+							nick + " is a stupid person",
+							nick + " is an utter idiot",
+							nick + " is literally worse than Hitler",
+							nick + " has two mums",
+							nick + " has two dads",
+							"Stay away from " + nick + " he has coodies",
 						]
-
+		r=random.randrange(0, len(insultLst))
+		return insultLst[r]
 	def isUp(self, website):
 		try:
 			url = urllib3.PoolManager()
@@ -57,3 +60,4 @@ class KrautCMDs(object):
 			print(e)
 			return False
 		return False
+
